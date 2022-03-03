@@ -26,7 +26,7 @@ const initDatabaseFactory = async (configService: ConfigService) => {
   providers: [
     DatabaseService,
     {
-      provide: 'POSTGRES_POOL',
+      provide: 'POSTGRES_CLIENT',
       inject: [ConfigService],
       useFactory: async (configService: ConfigService) =>
         await initDatabaseFactory(configService),

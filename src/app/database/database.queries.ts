@@ -8,6 +8,14 @@ export const INIT_TABLES_AND_CONSTRAINTS = `
 		start_date DATE,
 		end_date DATE,
 		car_number TEXT REFERENCES public.Car(car_number),
-		CHECK DATED
+		CHECK (
+			DATE_PART('day', end_date::timestamp - start_date::timestamp) >= 1 AND 
+			DATE_PART('day', end_date::timestamp - start_date::timestamp) <= 30
+		) 
 	);
+
+	CREATE TABLE IF NOT EXISTS public.Rate(
+		id TEXT NOT NULL PRIMARY KEY,
+		percent SMALLINT
+	)
 `;
