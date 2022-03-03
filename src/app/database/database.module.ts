@@ -2,12 +2,18 @@ import { Module } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { DatabaseService } from './database.service';
 import { Client } from 'pg';
-import { INIT_TABLES_AND_CONSTRAINTS } from './database.queries';
+import {
+  INIT_PROCEDURES_FUNCTIONS_AND_VIEWS,
+  INIT_TABLES_AND_CONSTRAINTS,
+  INSERT_INITIAL_DATA,
+} from './database.queries';
+import { CarsModule } from './entities/cars/cars.module';
 
 const initTables = async (client: Client) => {
   await client.connect();
   await client.query(INIT_TABLES_AND_CONSTRAINTS);
-  await client.end();
+  await client.query(INIT_PROCEDURES_FUNCTIONS_AND_VIEWS);
+  await client.query(INSERT_INITIAL_DATA);
 };
 
 const initDatabaseFactory = async (configService: ConfigService) => {
@@ -32,5 +38,6 @@ const initDatabaseFactory = async (configService: ConfigService) => {
         await initDatabaseFactory(configService),
     },
   ],
+  exports: ['POSTGRES_CLIENT'],
 })
 export class DatabaseModule {}
