@@ -1,5 +1,11 @@
 import { Inject, Injectable } from '@nestjs/common';
-import { Pool } from 'pg';
+import { Client, Pool } from 'pg';
 
 @Injectable()
-export class DatabaseService {}
+export class DatabaseService {
+  constructor(@Inject('POSTGRES_CLIENT') private client: Client) {}
+
+  getClient() {
+    return this.client;
+  }
+}

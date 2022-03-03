@@ -1,13 +1,15 @@
-import { Inject, Injectable } from '@nestjs/common';
-import { Client } from 'pg';
+import { Injectable } from '@nestjs/common';
+import { DatabaseService } from '../../database.service';
 import { Car } from './car.entity';
 import { INSERT_CAR } from './cars.queries';
 
 @Injectable()
 export class CarsService {
-  constructor(@Inject('POSTGRES_CLIENT') private client: Client) {}
+  constructor(private databaseService: DatabaseService) {}
 
   async insert(newCar: Car) {
-    return await this.client.query(await INSERT_CAR(newCar.carNumber));
+    return await this.databaseService
+      .getClient()
+      .query(await INSERT_CAR(newCar.carNumber));
   }
 }

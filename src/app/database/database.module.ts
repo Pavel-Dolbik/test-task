@@ -38,6 +38,6 @@ const initDatabaseFactory = async (configService: ConfigService) => {
         await initDatabaseFactory(configService),
     },
   ],
-  exports: ['POSTGRES_CLIENT'],
+  exports: ['POSTGRES_CLIENT', DatabaseService],
 })
 export class DatabaseModule {}
