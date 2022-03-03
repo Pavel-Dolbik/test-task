@@ -5,7 +5,7 @@ import { INSERT_CAR } from './cars.queries';
 
 @Injectable()
 export class CarsService {
-  constructor(private databaseService: DatabaseService) {}
+  constructor(private readonly databaseService: DatabaseService) {}
 
   async insert(newCar: Car) {
     return await this.databaseService
