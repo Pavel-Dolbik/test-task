@@ -1,7 +1,7 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { Client } from 'pg';
 import { Car } from './car.entity';
-import { INSERT_CAR } from './car.queries';
+import { INSERT_CAR } from './cars.queries';
 
 @Injectable()
 export class CarsService {

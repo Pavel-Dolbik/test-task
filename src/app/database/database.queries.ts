@@ -31,7 +31,7 @@ export const INIT_PROCEDURES_FUNCTIONS_AND_VIEWS = `
 			SELECT count(*) INTO count_of_cars FROM Cars;
 			IF count_of_cars < 5 THEN
 				INSERT INTO Cars VALUES (car_num);
-				RETURN QUERY SELECT * FROM Cars;
+				RETURN QUERY SELECT * FROM Cars ORDER BY Cars DESC LIMIT 1;
 			ELSE
 				RAISE EXCEPTION 'The car park is full.';
 			END IF;
