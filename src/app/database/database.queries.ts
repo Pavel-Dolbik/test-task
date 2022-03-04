@@ -54,7 +54,7 @@ export const INIT_PROCEDURES_FUNCTIONS_AND_VIEWS = `
 				ORDER BY Rent_Sessions."endDate" DESC LIMIT 1;
 			IF _start_date - lastDate >= 3 OR lastDate IS NULL THEN
 				INSERT INTO Rent_Sessions VALUES (_id, _start_date, _end_date, _car_number);
-				RETURN QUERY SELECT * FROM Rent_Sessions;
+				RETURN QUERY SELECT * FROM Rent_Sessions WHERE Rent_Sessions.id LIKE _id;
 			ELSE
 				RAISE EXCEPTION 'Error cannot create rent_session'
 					USING HINT = 'You have already booked parking ' || _start_date - lastDate || ' days ago';
@@ -71,7 +71,6 @@ export const INSERT_INITIAL_DATA = `
 	SELECT * FROM insert_car('4224 МО-2');
 	SELECT * FROM insert_car('3232 МГ-5');
 
-	INSERT INTO Rates(percent) VALUES (0);
 	INSERT INTO Rates(percent) VALUES (5);
 	INSERT INTO Rates(percent) VALUES (10);
 	INSERT INTO Rates(percent) VALUES (15);
