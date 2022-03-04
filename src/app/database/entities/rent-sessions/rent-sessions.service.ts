@@ -10,7 +10,7 @@ export class RentSessionsService {
   constructor(private readonly databaseService: DatabaseService) {}
 
   async insert(newRentSession: CreateRentSessionDto) {
-    await this.checkDates([
+    await this.checkStartAndEndDates([
       new Date(newRentSession.startDate),
       new Date(newRentSession.endDate),
     ]);
@@ -19,7 +19,7 @@ export class RentSessionsService {
       .query(INSERT_RENT_SESSION(newRentSession));
   }
 
-  async checkDates(dates: Date[]) {
+  async checkStartAndEndDates(dates: [Date, Date]) {
     for (const date of dates) {
       if (HOLIDAYS[date.getDay()] !== undefined) {
         throw new BadRequestException(MESSAGE.ERROR.INCORRECT_DATE);
