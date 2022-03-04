@@ -10,7 +10,7 @@ async function bootstrap() {
   const options = new DocumentBuilder()
     .setTitle('Test task')
     .addTag('Cars')
-    .addTag('Rents')
+    .addTag('RentSessions')
     .build();
   const swaggerDocument = SwaggerModule.createDocument(app, options);
   SwaggerModule.setup('api', app, swaggerDocument);

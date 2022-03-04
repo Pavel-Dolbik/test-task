@@ -7,13 +7,16 @@ import {
   INIT_TABLES_AND_CONSTRAINTS,
   INSERT_INITIAL_DATA,
 } from './database.queries';
-import { CarsModule } from './entities/cars/cars.module';
 
-const initTables = async (client: Client) => {
+const initTables = async (client: Client, configService: ConfigService) => {
   await client.connect();
   await client.query(INIT_TABLES_AND_CONSTRAINTS);
   await client.query(INIT_PROCEDURES_FUNCTIONS_AND_VIEWS);
-  await client.query(INSERT_INITIAL_DATA);
+  const insertInitialData = configService.get<string>('INSERT_INITIAL_DATA');
+
+  if (insertInitialData === true.toString()) {
+    await client.query(INSERT_INITIAL_DATA);
+  }
 };
 
 const initDatabaseFactory = async (configService: ConfigService) => {
@@ -24,7 +27,7 @@ const initDatabaseFactory = async (configService: ConfigService) => {
     password: configService.get<string>('POSTGRES_PASSWORD'),
     database: configService.get<string>('POSTGRES_DATABASE'),
   });
-  await initTables(client);
+  await initTables(client, configService);
   return client;
 };
 

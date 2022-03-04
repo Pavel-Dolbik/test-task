@@ -1,2 +1,4 @@
-export const INSERT_CAR = async (carNumber: string) =>
-  `SELECT * FROM public.insert_car('${carNumber}')`;
+import { Car } from './car.entity';
+
+export const INSERT_CAR = (newCar: Car) =>
+  `SELECT * FROM public.insert_car('${newCar.carNumber}')`;

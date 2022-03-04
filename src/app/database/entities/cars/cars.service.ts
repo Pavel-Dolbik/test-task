@@ -8,8 +8,6 @@ export class CarsService {
   constructor(private readonly databaseService: DatabaseService) {}
 
   async insert(newCar: Car) {
-    return await this.databaseService
-      .getClient()
-      .query(await INSERT_CAR(newCar.carNumber));
+    return await this.databaseService.getClient().query(INSERT_CAR(newCar));
   }
 }
