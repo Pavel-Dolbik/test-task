@@ -5,13 +5,13 @@ export const INIT_TABLES_AND_CONSTRAINTS = `
 
 	CREATE TABLE IF NOT EXISTS Rent_Sessions(
 		id TEXT NOT NULL PRIMARY KEY,
-		"startDate" DATE,
-		"endDate" DATE,
-		"carNumber" TEXT REFERENCES Cars("carNumber"),
+		"startDate" TIMESTAMP WITH TIME ZONE,
+		"endDate" TIMESTAMP WITH TIME ZONE,
+		"carNumber" TEXT REFERENCES Cars("carNumber") ON DELETE CASCADE,
 		CHECK (
 			"endDate" > "startDate" AND
-		 	"endDate" - "startDate" >= 1 AND 
-			"endDate" - "startDate" <= 30
+		 	"endDate" - "startDate" >= '1 day'::interval AND 
+			"endDate" - "startDate" <= '30 days'::interval
 		) 
 	);
 
@@ -21,7 +21,16 @@ export const INIT_TABLES_AND_CONSTRAINTS = `
 	);
 `;
 
-export const INIT_PROCEDURES_FUNCTIONS_AND_VIEWS = `
+export const INIT_VIEWS = `
+DROP VIEW IF EXISTS DataForReport;
+
+CREATE VIEW DataForReport
+AS SELECT Cars."carNumber", Rent_sessions."endDate", Rent_sessions."startDate", Rent_sessions."endDate" - Rent_sessions."startDate" AS "diffInDays"
+FROM Cars JOIN Rent_sessions ON Rent_sessions."carNumber" = Cars."carNumber";
+
+SELECT * FROM DataForReport;`;
+
+export const INIT_FUNCTIONS = `
 	DROP FUNCTION IF EXISTS insert_car;
 
 	CREATE OR REPLACE FUNCTION insert_car(car_num TEXT)
@@ -65,11 +74,15 @@ export const INIT_PROCEDURES_FUNCTIONS_AND_VIEWS = `
 `;
 
 export const INSERT_INITIAL_DATA = `
-	SELECT * FROM insert_car('9832 ГС-1');
-	SELECT * FROM insert_car('9212 МН-3');
-	SELECT * FROM insert_car('3244 ГС-3');
-	SELECT * FROM insert_car('4224 МО-2');
-	SELECT * FROM insert_car('3232 МГ-5');
+	DELETE FROM Cars;
+
+	INSERT INTO Cars VALUES ('9832 ГС-1');
+	INSERT INTO Cars VALUES ('9212 МН-3');
+	INSERT INTO Cars VALUES ('3244 ГС-3');
+	INSERT INTO Cars VALUES ('4224 МО-2');
+	INSERT INTO Cars VALUES ('3232 МГ-5');
+
+	DELETE FROM Rates;
 
 	INSERT INTO Rates(percent) VALUES (5);
 	INSERT INTO Rates(percent) VALUES (10);

@@ -1,5 +1,5 @@
 import { Inject, Injectable } from '@nestjs/common';
-import { Client, Pool } from 'pg';
+import { Client } from 'pg';
 
 @Injectable()
 export class DatabaseService {

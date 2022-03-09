@@ -1,4 +1,4 @@
-import { Controller, Get } from '@nestjs/common';
+import { Controller, Get, Param } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 import { PriceService } from './price.service';
 
@@ -7,8 +7,8 @@ import { PriceService } from './price.service';
 export class PriceController {
   constructor(private readonly priceService: PriceService) {}
 
-  @Get()
-  async computePriceForSessionPeriod(id: string) {
-    return await this.computePriceForSessionPeriod(id);
+  @Get(':id')
+  async computePriceForSessionPeriod(@Param('id') rentSessionId: string) {
+    return await this.priceService.computePriceForSessionPeriod(rentSessionId);
   }
 }

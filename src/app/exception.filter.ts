@@ -24,10 +24,13 @@ export class AllExceptionsFilter implements ExceptionFilter {
         ? exception.getStatus()
         : HttpStatus.INTERNAL_SERVER_ERROR;
 
+    const message = exception instanceof HttpException ? exception.message : '';
+
     const responseBody = {
       statusCode: httpStatus,
       timestamp: new Date().toISOString(),
       path: httpAdapter.getRequestUrl(ctx.getRequest()),
+      message,
     };
 
     httpAdapter.reply(ctx.getResponse(), responseBody, httpStatus);

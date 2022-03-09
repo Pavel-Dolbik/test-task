@@ -1,7 +1,6 @@
-import { HttpAdapterHost, NestFactory } from '@nestjs/core';
+import { NestFactory } from '@nestjs/core';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { AppModule } from './app/app.module';
-import { AllExceptionsFilter } from './app/exception.filter';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -12,6 +11,7 @@ async function bootstrap() {
     .addTag('Cars')
     .addTag('RentSessions')
     .addTag('Price')
+    .addTag('Report')
     .build();
   const swaggerDocument = SwaggerModule.createDocument(app, options);
   SwaggerModule.setup('api', app, swaggerDocument);

@@ -1,4 +1,6 @@
 import { Car } from './car.entity';
 
 export const INSERT_CAR = (newCar: Car) =>
-  `SELECT * FROM public.insert_car('${newCar.carNumber}')`;
+  `INSERT INTO Cars VALUES ('${newCar.carNumber}');`;
+
+export const COUNT = `SELECT count(*) FROM Cars;`;

@@ -3,15 +3,15 @@ import { ConfigService } from '@nestjs/config';
 import { DatabaseService } from './database.service';
 import { Client } from 'pg';
 import {
-  INIT_PROCEDURES_FUNCTIONS_AND_VIEWS,
   INIT_TABLES_AND_CONSTRAINTS,
+  INIT_VIEWS,
   INSERT_INITIAL_DATA,
 } from './database.queries';
 
 const initTables = async (client: Client, configService: ConfigService) => {
   await client.connect();
   await client.query(INIT_TABLES_AND_CONSTRAINTS);
-  await client.query(INIT_PROCEDURES_FUNCTIONS_AND_VIEWS);
+  await client.query(INIT_VIEWS);
   const insertInitialData = configService.get<string>('INSERT_INITIAL_DATA');
 
   if (insertInitialData === true.toString()) {
