@@ -6,6 +6,7 @@ import { CreateRentSessionDto } from './rent-sessions.dto';
 import {
   INSERT_RENT_SESSION,
   SELECT_ALL_RENT_SESSIONS,
+  SELECT_BOOKED_SESSION,
   SELECT_LAST_SESSION,
   SELECT_RENT_SESSION_BY_ID,
 } from './rent-sessions.queries';
@@ -24,6 +25,10 @@ export class RentSessionsService {
       new Date(newRentSession.startDate),
       newRentSession.carNumber,
     );
+    await this.checkBookedSession(
+      new Date(newRentSession.endDate),
+      newRentSession.carNumber,
+    );
     return await this.getClient().query(INSERT_RENT_SESSION(newRentSession));
   }
 
@@ -39,6 +44,27 @@ export class RentSessionsService {
     for (const date of dates) {
       if (HOLIDAYS[date.getDay()] !== undefined) {
         throw new BadRequestException(MESSAGE.ERROR.INCORRECT_DATE);
+      }
+    }
+  }
+
+  private async checkBookedSession(endDate: Date, carNumber: string) {
+    await console.log(
+      SELECT_BOOKED_SESSION(carNumber, endDate.toISOString().split('T')[0]),
+    );
+
+    const queryResult = await this.getClient().query(
+      SELECT_BOOKED_SESSION(carNumber, endDate.toISOString().split('T')[0]),
+    );
+    if (queryResult.rows.length > 0 && queryResult.rows[0].startDate) {
+      const startDateOfBookedSession = queryResult.rows[0].startDate;
+      if (
+        startDateOfBookedSession &&
+        dateDifference(endDate, startDateOfBookedSession) < 3
+      ) {
+        throw new BadRequestException(
+          MESSAGE.ERROR.YOU_HAVE_ALREADY_BOOKED_PARKING,
+        );
       }
     }
   }

@@ -27,3 +27,9 @@ export const SELECT_LAST_SESSION = (carNumber: string) => `
 	  WHERE "carNumber" = '${carNumber}'
 	  ORDER BY "endDate" DESC LIMIT 1;
 `;
+
+export const SELECT_BOOKED_SESSION = (carNumber: string, endDate: string) => `
+  SELECT "startDate" FROM Rent_Sessions
+  WHERE "carNumber" = '${carNumber}' AND "endDate" >= '${endDate}'\
+  ORDER BY "startDate" ASC LIMIT 1;
+`;
