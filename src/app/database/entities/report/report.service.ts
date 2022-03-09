@@ -1,40 +1,60 @@
 import { Injectable } from '@nestjs/common';
+import { QueryResult } from 'pg';
 import {
   dateDifference,
   daysInMonthOfDate,
   percentOfDays,
 } from 'src/app/helpers/helpers';
 import { DatabaseService } from '../../database.service';
-import { SELECT_ALL_RENT_SESSIONS } from '../rent-sessions/rent-sessions.queries';
+import {
+  SELECT_ALL_RENT_SESSIONS,
+  SELECT_SESSION_BY_CAR_NUMBER,
+} from '../rent-sessions/rent-sessions.queries';
 
 @Injectable()
 export class ReportService {
   constructor(private readonly databaseService: DatabaseService) {}
 
+  async selectByCar(carNumber: string) {
+    const queryResult = await this.getClient().query(
+      SELECT_SESSION_BY_CAR_NUMBER(carNumber),
+    );
+    return this.showReport(queryResult);
+  }
+
   async selectAll() {
     const queryResult = await this.getClient().query(SELECT_ALL_RENT_SESSIONS);
+    return this.showReport(queryResult);
+  }
 
+  private showReport(queryResult: QueryResult<any>) {
     const result = [];
     for (const row of queryResult.rows) {
-      const secondDate = row.endDate;
-      const firstDate = row.startDate;
-      while (secondDate > firstDate) {
+      const intermediateSecondDate: Date = row.endDate;
+      const intermediateFirstDate: Date = row.startDate;
+      while (intermediateSecondDate > intermediateFirstDate) {
         let diffInDays = 0;
-        if (secondDate.getDate() === 1) {
-          diffInDays += secondDate.getDate();
-          secondDate.setDate(secondDate.getDate() - 1);
+        if (intermediateSecondDate.getDate() === 1) {
+          diffInDays += intermediateSecondDate.getDate();
+          intermediateSecondDate.setDate(intermediateSecondDate.getDate() - 1);
         } else {
-          if (secondDate.getMonth() !== firstDate.getMonth()) {
-            diffInDays += secondDate.getDate();
+          if (
+            intermediateSecondDate.getMonth() !==
+            intermediateFirstDate.getMonth()
+          ) {
+            diffInDays += intermediateSecondDate.getDate();
           } else {
-            diffInDays += dateDifference(firstDate, secondDate);
+            diffInDays += dateDifference(
+              intermediateFirstDate,
+              intermediateSecondDate,
+            );
           }
-          secondDate.setDate(0);
+          intermediateSecondDate.setDate(0);
         }
 
         const daysInMonth = daysInMonthOfDate(
-          secondDate.getFullYear(),
-          secondDate.getMonth() + 1,
+          intermediateSecondDate.getFullYear(),
+          intermediateSecondDate.getMonth() + 1,
         );
         const percent = percentOfDays(diffInDays, daysInMonth);
 

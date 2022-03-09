@@ -1,4 +1,4 @@
-import { Controller, Get } from '@nestjs/common';
+import { Controller, Get, Param } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 import { ReportService } from './report.service';
 
@@ -10,5 +10,10 @@ export class ReportController {
   @Get()
   async showReport() {
     return await this.reportService.selectAll();
+  }
+
+  @Get(':carNumber')
+  async showReportByCarNumber(@Param('carNumber') carNumber: string) {
+    return await this.reportService.selectByCar(carNumber);
   }
 }

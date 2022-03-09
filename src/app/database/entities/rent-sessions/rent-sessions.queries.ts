@@ -17,6 +17,10 @@ export const SELECT_RENT_SESSION_BY_ID = (id: string) =>
 
 export const SELECT_ALL_RENT_SESSIONS = 'SELECT * FROM Rent_Sessions;';
 
+export const SELECT_SESSION_BY_CAR_NUMBER = (carNumber: string) => `
+  SELECT * FROM Rent_sessions WHERE "carNumber" = '${carNumber}';
+`;
+
 export const SELECT_LAST_SESSION = (carNumber: string) => `
   SELECT "endDate" 
     FROM Rent_Sessions 
