@@ -10,6 +10,8 @@ import {
   SELECT_ALL_RENT_SESSIONS,
   SELECT_SESSION_BY_CAR_NUMBER,
 } from '../rent-sessions/rent-sessions.queries';
+import * as excel from 'xlsx';
+import { REPORT_SUCCESSFULLY_CREATED } from './constants';
 
 @Injectable()
 export class ReportService {
@@ -19,57 +21,80 @@ export class ReportService {
     const queryResult = await this.getClient().query(
       SELECT_SESSION_BY_CAR_NUMBER(carNumber),
     );
-    return this.showReport(queryResult);
+    return await this.makeReport(queryResult, carNumber);
   }
 
   async selectAll() {
     const queryResult = await this.getClient().query(SELECT_ALL_RENT_SESSIONS);
-    return this.showReport(queryResult);
+    return await this.makeReport(queryResult);
   }
 
-  private showReport(queryResult: QueryResult<any>) {
+  private async makeReport(queryResult: QueryResult<any>, carNumber?: string) {
     const result = [];
     for (const row of queryResult.rows) {
-      const intermediateSecondDate: Date = row.endDate;
-      const intermediateFirstDate: Date = row.startDate;
+      const intermediateSecondDate = row.endDate;
+      const intermediateFirstDate = row.startDate;
       while (intermediateSecondDate > intermediateFirstDate) {
+        const month = intermediateSecondDate.toLocaleString('default', {
+          month: 'long',
+        });
         let diffInDays = 0;
-        if (intermediateSecondDate.getDate() === 1) {
-          diffInDays += intermediateSecondDate.getDate();
-          intermediateSecondDate.setDate(intermediateSecondDate.getDate() - 1);
+        if ((await intermediateSecondDate.getDate()) === 1) {
+          diffInDays += await intermediateSecondDate.getDate();
+          await intermediateSecondDate.setDate(
+            intermediateSecondDate.getDate() - 1,
+          );
         } else {
           if (
-            intermediateSecondDate.getMonth() !==
-            intermediateFirstDate.getMonth()
+            (await intermediateSecondDate.getMonth()) !==
+            (await intermediateFirstDate.getMonth())
           ) {
-            diffInDays += intermediateSecondDate.getDate();
+            diffInDays += await intermediateSecondDate.getDate();
           } else {
             diffInDays += dateDifference(
               intermediateFirstDate,
               intermediateSecondDate,
             );
           }
-          intermediateSecondDate.setDate(0);
+          await intermediateSecondDate.setDate(0);
         }
 
         const daysInMonth = daysInMonthOfDate(
-          intermediateSecondDate.getFullYear(),
-          intermediateSecondDate.getMonth() + 1,
+          await intermediateSecondDate.getFullYear(),
+          (await intermediateSecondDate.getMonth()) + 1,
         );
         const percent = percentOfDays(diffInDays, daysInMonth);
 
         result.push({
+          sessionId: row.id,
           carNumber: row.carNumber,
-          month: row.endDate.toLocaleString('default', { month: 'long' }),
+          month,
           percent,
         });
       }
-      console.log();
     }
-    return result;
+    return await this.createExcelFile(result, carNumber);
   }
 
-  getClient() {
+  private async createExcelFile(result: any[], carNumber?: string) {
+    const wb = excel.utils.book_new();
+    let fileName = 'D:\\\\Downloads\\Report_testtask.xls';
+    if (carNumber) {
+      fileName = `D:\\\\Downloads\\Report_testtask_${carNumber}.xls`;
+    }
+
+    const data = [result];
+
+    data.forEach((array) => {
+      const ws = excel.utils.json_to_sheet(array);
+      excel.utils.book_append_sheet(wb, ws, 'Report');
+    });
+
+    excel.writeFile(wb, fileName);
+    return REPORT_SUCCESSFULLY_CREATED;
+  }
+
+  private getClient() {
     return this.databaseService.getClient();
   }
 }
